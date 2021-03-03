@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import numpy as np
 import joblib
 import sys
@@ -54,18 +55,31 @@ class MenuOperator():
             self.update()
         else:
             self.text.write('\n'.join(textwrap.wrap(str(self.data[key]), width=self.text._width)))
+
     def preview(self, par):
         in_prog = self.menu.get()
         #print(in_prog, select)
         #import ipdb; ipdb.set_trace()
         pos = self.select.index(in_prog) + par
+        if pos >= len(self.select):
+            return
         in_prog = self.select[pos]
         self.text.clear()
         key = in_prog.split(':')[0].strip()
         if key == 'Quit':
             return
-        self.text.write('\n'.join(textwrap.wrap(str(self.data[key]), width=self.text._width)))
+        self.text.write(self.format(self.data[key]))
 
+    def format(self, obj):
+        if isinstance(obj, dict):
+            lines = []
+            for key, value in obj.items():
+                lines.append('%s : %s' % (key, value))
+            lines = '\n'.join(lines)
+            #import ipdb; ipdb.set_trace()
+            return lines #'\n'.join(textwrap.wrap(lines, width=self.text._width))
+        else:
+            return '\n'.join(textwrap.wrap(str(obj), width=self.text._width))
 mo = MenuOperator(jdata)
 root.set_selected_widget(mo.menu)
 root._in_focused_mode=True
